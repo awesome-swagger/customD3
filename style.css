@@ -1,0 +1,15 @@
+svg {
+    display: block;
+    margin: 0px auto;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+text{
+    font-weight: bold;
+    text-anchor:middle;
+}
+
+rect{
+    stroke: rgb(94, 94, 94);
+    stroke-width: 2;
+}

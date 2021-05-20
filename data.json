@@ -1,0 +1,48 @@
+{
+
+	"widgets" : [
+
+		{
+			"widget_id" : "123",
+			"url"       : "http://www.google.com",
+			"timestamp" : "May 16, 2021 12:52:22 UTC",
+			"entities"  : [
+			
+					{"name": "A","hash":"SHA-256"},
+					{"name": "B","hash":"SHA-256"},
+					{"name": "C","hash":"SHA-256"}
+
+			]
+		},
+		{
+
+			"widget_id" : "456",
+			"url"       : "http://www.bing.com",
+			"timestamp" : "May 17, 2021 12:24:38 UTC",
+			"entities"  : [
+
+
+				{"name":"A","hash":"SHA-256"},
+				{"name":"D","hash":"SHA-256"},
+				{"name":"E","hash":"SHA-256"}
+
+
+			]
+
+
+		}
+	],
+	"connections" : [
+
+		{
+
+			"source_widget" : "123",
+			"source_entity" : "A",
+			"destination_widget" : "456",
+			"destination_entity" : "A"
+
+		}
+
+	]
+
+}
