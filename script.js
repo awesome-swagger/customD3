@@ -20,7 +20,7 @@ const ResearchWidget = (data) => {
   const colorArray = ["#C7E8AC", "#99D2F2","#F28F80"]
 
   const tooltip = d3.select(".tooltip");
-
+  
   d3.selection.prototype.moveToFront = function() {
     return this.each(function(){
       this.parentNode.appendChild(this);
@@ -68,10 +68,12 @@ const ResearchWidget = (data) => {
       return;
     }
 
-    tooltip.style('top', d3.event.sourceEvent.pageY + 'px').style('left', d3.event.sourceEvent.pageX + 'px');
-
     d.fx += d3.event.dx;
     d.fy += d3.event.dy;
+
+    const tooltipRect = tooltip.node().getBoundingClientRect();
+
+    tooltip.style('top', d.fy - tooltipRect.height + 'px').style('left', (d.fx + xDiff - 2 - tooltipRect.width / 2 + bigRectLength * 1.5) + 'px');
 
     d3.select(this).attr("transform", `translate(${d.fx},${d.fy})`)
     updateEdge(d.widget_id);
@@ -95,7 +97,7 @@ const ResearchWidget = (data) => {
       })
       .attr("transform", (d) => `translate(${d.fx},${d.fy})`)
       .attr("render-order", 1)
-      .call(d3.drag().on('start', dragStarted).on('drag', dragged).on('end', ()=>tooltip.transition().duration(200).style("opacity", "0")));
+      .call(d3.drag().on('start', dragStarted).on('drag', dragged));
   
   // Lock rect
   groups.append("rect")
@@ -108,8 +110,10 @@ const ResearchWidget = (data) => {
     .attr('class', 'bigRect lock')
     .on('mousedown', (d) => {
       tooltip.html(`<p>URL:${d.url} </p> <p> Timestamp: ${d.timestamp} </p>`)
-              .style('top', d3.event.pageY + 'px').style('left', d3.event.pageX + 'px')
               .transition().duration(300).style("opacity", "1");
+      
+      const tooltipRect = tooltip.node().getBoundingClientRect();
+      tooltip.style('top', d.fy - tooltipRect.height + 'px').style('left', (d.fx + xDiff - 2 - tooltipRect.width / 2 + bigRectLength * 1.5) + 'px');
     });
 
   const nodeGroup = groups.selectAll('g')
@@ -117,7 +121,8 @@ const ResearchWidget = (data) => {
         return {...entity, id: `${d.widget_id}_${entity.name}`}
       })).enter()
       .append('g')
-        .attr("transform", (d,i) =>(`translate(${(bigRectLength) * i}, ${bigRectLength})`));
+        .attr("transform", (d,i) =>(`translate(${(bigRectLength) * i}, ${bigRectLength})`))
+        .on('mousedown', ()=>tooltip.transition().duration(200).style("opacity", "0"));
     nodeGroup.append("rect")
       .attr("rx", bigRectBorderRadius)
       .attr("ry", bigRectBorderRadius)
@@ -178,5 +183,5 @@ const ResearchWidget = (data) => {
 
 /* SECTION TO RETRIEVE DATA  AND CALL THE FUNCTION */
 d3.json("data.json").then((data) => {
-    ResearchWidget(data)
+  ResearchWidget(data)
 });

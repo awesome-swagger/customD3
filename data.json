@@ -20,7 +20,7 @@
 				{"name":"E","hash":"SHA-256"}
 			]
 		},
-        {
+		{
 			"widget_id" : "345",
 			"url"       : "http://www.yandex.ru",
 			"timestamp" : "May 17, 2021 12:24:38 UTC",
@@ -38,7 +38,7 @@
 			"destination_widget" : "456",
 			"destination_entity" : "A"
 		},
-    	{
+		{
 			"source_widget" : "123",
 			"source_entity" : "B",
 			"destination_widget" : "345",
