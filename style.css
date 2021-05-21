@@ -32,3 +32,8 @@ rect{
 .lock {
     cursor: pointer;
 }
+
+.zoom-btn {
+   stroke: none;
+   cursor: pointer;
+}

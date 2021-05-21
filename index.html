@@ -8,7 +8,13 @@
 <body>
   <div class="content">
     <div class="tooltip"></div>
-    <svg id="research-widget"></svg>
+    <svg id="research-widget">
+      <defs>
+        <pattern id="zoom_out" patternUnits="userSpaceOnUse" width="40" height="40"><image xlink:href="plus.svg" x="0" y="0"></image></pattern>
+        <pattern id="zoom_in" patternUnits="userSpaceOnUse" width="40" height="40"><image xlink:href="minus.svg" x="0" y="0"></image></pattern>
+        <pattern id="lock" patternUnits="userSpaceOnUse" width="80" height="80"><image xlink:href="lock_img.png" x="0" y="0"></image></pattern>
+      </defs>
+    </svg>
   </div>
   <script src="script.js"></script>
 </body>

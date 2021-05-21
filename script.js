@@ -10,6 +10,7 @@ const ResearchWidget = (data) => {
   const bigRectBorderRadius = bigRectLength / 15;
   const smallRectLength = bigRectLength / 5;
   const smallRectBorderRadius = smallRectLength / 4;
+  const zoomBtnSize = 25;
   const fontSize = 12;
   const xOffset = document.getElementById('research-widget').getBoundingClientRect().x;
   const markerBoxLength = 4;
@@ -21,7 +22,7 @@ const ResearchWidget = (data) => {
 
   const arrowPoints = [[0, 0], [0, markerBoxLength], [markerBoxLength, ref]];
 
-  const colorArray = ["#C7E8AC", "#99D2F2","#F28F80"]
+  const colorArray = ["#C7E8AC", "#99D2F2","#F28F80"];
 
   const tooltip = d3.select(".tooltip");
   
@@ -31,22 +32,35 @@ const ResearchWidget = (data) => {
     });
   };
   
+  /* Zoom in/out Button */
+  function onZoomIn() {
+    console.log('in');
+  }
+  function onZoomOut() {
+    console.log('out');
+  }
+  d3.select('#zoom_out image').attr('width', zoomBtnSize).attr('height', zoomBtnSize); 
+  d3.select('#zoom_in image').attr('width', zoomBtnSize).attr('height', zoomBtnSize); 
+  svg.append('rect')
+    .attr('class', 'zoom-btn')
+    .attr("transform", `translate(${width-zoomBtnSize-10}, 10)`)
+    .attr("fill", "url(#zoom_out)")
+    .attr('width', zoomBtnSize)
+    .attr('height', zoomBtnSize)
+    .on('click', onZoomOut);
+  svg.append('rect')
+    .attr('class', 'zoom-btn')
+    .attr("transform", `translate(${width-zoomBtnSize-10}, ${zoomBtnSize+20})`)
+    .attr("fill", "url(#zoom_in)")
+    .attr('width', zoomBtnSize)
+    .attr('height', zoomBtnSize)
+    .on('click', onZoomIn);
+  
   /* DEFS FOR THE LOCK IMAGE */
-  svg.append('defs')
-    .append('pattern')
-      .attr('id', 'pic1')
-      .attr('patternUnits', 'userSpaceOnUse')
-      .attr('width', bigRectLength)
-      .attr('height', bigRectLength)
-    .append('svg:image')
-      .attr('xlink:href', 'lock_img.png')
-      .attr("width", bigRectLength)
-      .attr("height", bigRectLength)
-      .attr("x", 0)
-      .attr("y", 0);
+  d3.select('#lock image').attr("width", bigRectLength).attr("height", bigRectLength);
 
   /* DEFS FOR MARKER */
-  svg
+  /*svg
     .append('defs')
     .append('marker')
       .attr('id', 'arrow')
@@ -60,7 +74,7 @@ const ResearchWidget = (data) => {
       .attr('d', d3.line()(arrowPoints))
       .attr('stroke', 'rgb(94, 94, 94)')
       .attr('fill', 'rgb(94, 94, 94)')
-
+  */
 
   function dragStarted(d) {
     d3.select(this).moveToFront();
@@ -131,7 +145,7 @@ const ResearchWidget = (data) => {
     .attr("transform", `translate(${bigRectLength}, 0)`)
     .attr("rx", bigRectBorderRadius)
     .attr("ry", bigRectBorderRadius)
-    .attr("fill", "url(#pic1)")
+    .attr("fill", "url(#lock)")
     .attr('width', bigRectLength)
     .attr('height', bigRectLength)
     .attr('class', 'bigRect lock')
