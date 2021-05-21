@@ -19,6 +19,8 @@ const ResearchWidget = (data) => {
 
   const colorArray = ["#C7E8AC", "#99D2F2","#F28F80"]
 
+  const tooltip = d3.select(".tooltip");
+
   d3.selection.prototype.moveToFront = function() {
     return this.each(function(){
       this.parentNode.appendChild(this);
@@ -55,7 +57,7 @@ const ResearchWidget = (data) => {
       .attr('stroke', 'rgb(94, 94, 94)')
       .attr('fill', 'rgb(94, 94, 94)')
 
-  function dragged(d) {  
+  function dragged(d) {
     if(
       (d.fx + d3.event.dx) > maxBoundingX ||
       (d.fx + d3.event.dx) < 0 ||
@@ -65,6 +67,9 @@ const ResearchWidget = (data) => {
       d3.event.sourceEvent.stopPropagation();
       return;
     }
+
+    tooltip.style('top', d3.event.sourceEvent.pageY + 'px').style('left', d3.event.sourceEvent.pageX + 'px');
+
     d.fx += d3.event.dx;
     d.fy += d3.event.dy;
 
@@ -75,11 +80,12 @@ const ResearchWidget = (data) => {
 
   function dragStarted(d) {
     d3.select(this).moveToFront();
+    tooltip.style("opacity", "0")
   }
 
   const groups = svg.selectAll('g')
-      .data(data["widgets"]).enter()
-      .append('g')
+    .data(data["widgets"]).enter()
+    .append('g')
       .attr('id', (d) => {				
         const dx = d3.randomUniform(0, maxBoundingX)();
         const dy = d3.randomUniform(bigRectLength, maxBoundingY)();
@@ -89,16 +95,22 @@ const ResearchWidget = (data) => {
       })
       .attr("transform", (d) => `translate(${d.fx},${d.fy})`)
       .attr("render-order", 1)
-      .call(d3.drag().on('start', dragStarted).on('drag', dragged));
-
-  const lockRect = groups.append("rect")
-      .attr("transform", `translate(${bigRectLength}, 0)`)
-      .attr("rx", bigRectBorderRadius)
-      .attr("ry", bigRectBorderRadius)
-      .attr("fill", "url(#pic1)")
-      .attr('width', bigRectLength)
-      .attr('height', bigRectLength)
-      .attr('class', 'bigRect lock')
+      .call(d3.drag().on('start', dragStarted).on('drag', dragged).on('end', ()=>tooltip.transition().duration(200).style("opacity", "0")));
+  
+  // Lock rect
+  groups.append("rect")
+    .attr("transform", `translate(${bigRectLength}, 0)`)
+    .attr("rx", bigRectBorderRadius)
+    .attr("ry", bigRectBorderRadius)
+    .attr("fill", "url(#pic1)")
+    .attr('width', bigRectLength)
+    .attr('height', bigRectLength)
+    .attr('class', 'bigRect lock')
+    .on('mousedown', (d) => {
+      tooltip.html(`<p>URL:${d.url} </p> <p> Timestamp: ${d.timestamp} </p>`)
+              .style('top', d3.event.pageY + 'px').style('left', d3.event.pageX + 'px')
+              .transition().duration(300).style("opacity", "1");
+    });
 
   const nodeGroup = groups.selectAll('g')
       .data(d=>d.entities.map(entity=>{
@@ -112,7 +124,7 @@ const ResearchWidget = (data) => {
       .attr('fill', (d,i)=> colorArray[i])
       .attr('width', bigRectLength)
       .attr('height', bigRectLength)
-      .attr('class', 'bigRect lock');
+      .attr('class', 'bigRect');
     nodeGroup.append("text")
       .text(d=> d.name)
       .attr('dy', bigRectLength/2 + (fontSize/2))
@@ -127,94 +139,44 @@ const ResearchWidget = (data) => {
       .attr('height', smallRectLength)
       .attr('fill', "#fff")
 
+  /* FUNCTION TO CREATE LINE */
+  var linkVertical = d3.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; });
+
   function makeEdge(d) {
     var source = document.getElementById(`${d.source_widget}_${d.source_entity}`).getBoundingClientRect();
     var target = document.getElementById(`${d.destination_widget}_${d.destination_entity}`).getBoundingClientRect();
     
     var maxY = Math.max(source.y, target.y) + yDiff;
     return [
-      [source.x-xDiff, source.y + 10],
-      [source.x-xDiff, maxY],
-      [target.x-xDiff, maxY],
-      [target.x-xDiff, target.y + 10]
+      {"x": source.x-xDiff, "y": source.y + smallRectLength/2},
+      {"x": source.x-xDiff, "y": maxY},
+      {"x": target.x-xDiff, "y": maxY},
+      {"x": target.x-xDiff, "y": target.y + smallRectLength/2}
     ];
   }
   const edges = svg.selectAll('.edge')
     .data(data.connections).enter()
-    .append("polyline")
+    .append("path")
     .attr('class', 'edge')
     .attr("stroke", "#999")
     .attr("stroke-width", 2)
-    .attr('marker-start', 'url(#arrow)')
-    .attr('marker-end', 'url(#arrow)')
     .attr("fill", "none")
-    .attr("points", makeEdge)
+    .attr("d", d=>linkVertical(makeEdge(d)))
     .attr("render-order", -1);
 
   function updateEdge(widgetId) {
     var edge = edges.filter(d => d.source_widget === widgetId || d.destination_widget === widgetId).nodes();
     edge.forEach((e) => {
       const selection = d3.select(e);
-      selection.attr("points", makeEdge);
+      selection.attr("d", d=>linkVertical(makeEdge(d)))
       selection.moveToFront();
     })
   }
 }
 
-const data = {
-	"widgets" : [
-		{
-			"widget_id" : "123",
-			"url"       : "http://www.google.com",
-			"timestamp" : "May 16, 2021 12:52:22 UTC",
-			"entities"  : [
-					{"name": "A","hash":"SHA-256"},
-					{"name": "B","hash":"SHA-256"},
-					{"name": "C","hash":"SHA-256"}
-			]
-		},
-        
-		{
-			"widget_id" : "456",
-			"url"       : "http://www.bing.com",
-			"timestamp" : "May 17, 2021 12:24:38 UTC",
-			"entities"  : [
-				{"name":"A","hash":"SHA-256"},
-				{"name":"D","hash":"SHA-256"},
-				{"name":"E","hash":"SHA-256"}
-			]
-		},
-        {
-			"widget_id" : "345",
-			"url"       : "http://www.bing.com",
-			"timestamp" : "May 17, 2021 12:24:38 UTC",
-			"entities"  : [
-				{"name":"Y","hash":"SHA-256"},
-				{"name":"J","hash":"SHA-256"},
-				{"name":"K","hash":"SHA-256"}
-			]
-		}
-	],
-	"connections" : [
-		{
-			"source_widget" : "123",
-			"source_entity" : "A",
-			"destination_widget" : "456",
-			"destination_entity" : "A"
-		},
-    {
-			"source_widget" : "123",
-			"source_entity" : "C",
-			"destination_widget" : "456",
-			"destination_entity" : "A"
-		},
-    {
-			"source_widget" : "123",
-			"source_entity" : "B",
-			"destination_widget" : "345",
-			"destination_entity" : "K"
-		}
-	]
-}
-
-ResearchWidget(data);
+/* SECTION TO RETRIEVE DATA  AND CALL THE FUNCTION */
+d3.json("data.json").then((data) => {
+    ResearchWidget(data)
+});

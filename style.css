@@ -1,3 +1,14 @@
+.content {
+    position: relative;
+}
+.tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    opacity: 0;
+}
 svg {
     display: block;
     margin: 0px auto;
@@ -12,4 +23,8 @@ text{
 rect{
     stroke: rgb(94, 94, 94);
     stroke-width: 2;
+}
+
+.lock {
+    cursor: pointer;
 }
