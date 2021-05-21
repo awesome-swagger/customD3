@@ -9,6 +9,9 @@
     padding: 5px;
     opacity: 0;
 }
+.tooltip p {
+    margin: 2px 0;
+}
 svg {
     display: block;
     margin: 0px auto;
