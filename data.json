@@ -17,7 +17,7 @@
 			"entities"  : [
 				{"name":"A","hash":"SHA-256"},
 				{"name":"D","hash":"SHA-256"},
-				{"name":"E","hash":"SHA-256"}
+				{"name":"K","hash":"SHA-256"}
 			]
 		},
 		{
@@ -39,8 +39,8 @@
 			"destination_entity" : "A"
 		},
 		{
-			"source_widget" : "123",
-			"source_entity" : "B",
+			"source_widget" : "456",
+			"source_entity" : "k",
 			"destination_widget" : "345",
 			"destination_entity" : "K"
 		}

@@ -1,19 +1,23 @@
 const ResearchWidget = (data) => {
   const svg = d3.select("#research-widget");
-  const width = +svg.attr("width");
-  const height = +svg.attr("height");
-  const bigRectLength = 80;
-  const bigRectBorderRadius = 5;
-  const smallRectLength = 12;
-  const smallRectBorderRadius = 2.5;
+  const windowWidth = window.innerWidth;
+  const width = windowWidth>1024 ? 1000 : windowWidth>768 ? 600 : 400;
+  const height = windowWidth>1024 ? 800 : windowWidth>768 ? 600 : 400;
+  svg.attr("width", width);
+  svg.attr("height", height);
+
+  const bigRectLength = windowWidth>1024 ? 80 : windowWidth>768 ? 60 : 40;
+  const bigRectBorderRadius = bigRectLength / 15;
+  const smallRectLength = bigRectLength / 5;
+  const smallRectBorderRadius = smallRectLength / 4;
   const fontSize = 12;
   const xOffset = document.getElementById('research-widget').getBoundingClientRect().x;
   const markerBoxLength = 4;
   const ref = markerBoxLength / 2;
   const xDiff = xOffset - smallRectLength/2;
   const yDiff = 50;
-  const maxBoundingX = width - bigRectLength*3;
-  const maxBoundingY = height - bigRectLength*2 - smallRectLength - yDiff;
+  const minBoundingX = 1, maxBoundingX = width - bigRectLength*3 - 1;
+  const minBoundingY = 1, maxBoundingY = height - bigRectLength*2 - smallRectLength - yDiff -1;
 
   const arrowPoints = [[0, 0], [0, markerBoxLength], [markerBoxLength, ref]];
 
@@ -26,7 +30,7 @@ const ResearchWidget = (data) => {
       this.parentNode.appendChild(this);
     });
   };
-
+  
   /* DEFS FOR THE LOCK IMAGE */
   svg.append('defs')
     .append('pattern')
@@ -57,12 +61,17 @@ const ResearchWidget = (data) => {
       .attr('stroke', 'rgb(94, 94, 94)')
       .attr('fill', 'rgb(94, 94, 94)')
 
+
+  function dragStarted(d) {
+    d3.select(this).moveToFront();
+    tooltip.style("opacity", "0")
+  }
   function dragged(d) {
     if(
       (d.fx + d3.event.dx) > maxBoundingX ||
-      (d.fx + d3.event.dx) < 0 ||
+      (d.fx + d3.event.dx) < minBoundingX ||
       (d.fy + d3.event.dy) > maxBoundingY ||
-      (d.fy + d3.event.dy) < bigRectLength
+      (d.fy + d3.event.dy) < minBoundingY
     ){
       d3.event.sourceEvent.stopPropagation();
       return;
@@ -80,17 +89,12 @@ const ResearchWidget = (data) => {
     d3.select(this).moveToFront();
   }
 
-  function dragStarted(d) {
-    d3.select(this).moveToFront();
-    tooltip.style("opacity", "0")
-  }
-
   const groups = svg.selectAll('g')
     .data(data["widgets"]).enter()
     .append('g')
       .attr('id', (d) => {				
-        const dx = d3.randomUniform(0, maxBoundingX)();
-        const dy = d3.randomUniform(bigRectLength, maxBoundingY)();
+        const dx = d3.randomUniform(minBoundingX, maxBoundingX)();
+        const dy = d3.randomUniform(minBoundingY, maxBoundingY)();
         d.fx = dx; d.fy = dy;
 
         return d.widget_id;
@@ -182,6 +186,57 @@ const ResearchWidget = (data) => {
 }
 
 /* SECTION TO RETRIEVE DATA  AND CALL THE FUNCTION */
-d3.json("data.json").then((data) => {
-  ResearchWidget(data)
-});
+// d3.json("data.json").then((data) => {
+//   ResearchWidget(data)
+// });
+
+const data = { 
+	"widgets" : [
+		{
+			"widget_id" : "123",
+			"url"       : "http://www.google.com",
+			"timestamp" : "May 16, 2021 12:52:22 UTC",
+			"entities"  : [
+					{"name": "A","hash":"SHA-256"},
+					{"name": "B","hash":"SHA-256"},
+					{"name": "C","hash":"SHA-256"}
+			]
+		},
+		{
+			"widget_id" : "456",
+			"url"       : "http://www.bing.com",
+			"timestamp" : "May 17, 2021 12:24:38 UTC",
+			"entities"  : [
+				{"name":"A","hash":"SHA-256"},
+				{"name":"D","hash":"SHA-256"},
+				{"name":"K","hash":"SHA-256"}
+			]
+		},
+		{
+			"widget_id" : "345",
+			"url"       : "http://www.yandex.ru",
+			"timestamp" : "May 17, 2021 12:24:38 UTC",
+			"entities"  : [
+				{"name":"Y","hash":"SHA-256"},
+				{"name":"J","hash":"SHA-256"},
+				{"name":"K","hash":"SHA-256"}
+			]
+		}
+	],
+	"connections" : [
+		{
+			"source_widget" : "123",
+			"source_entity" : "A",
+			"destination_widget" : "456",
+			"destination_entity" : "A"
+		},
+		{
+			"source_widget" : "456",
+			"source_entity" : "K",
+			"destination_widget" : "345",
+			"destination_entity" : "K"
+		}
+	]
+}
+
+ResearchWidget(data);
