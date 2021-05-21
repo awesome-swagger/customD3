@@ -89,17 +89,40 @@ const ResearchWidget = (data) => {
     d3.select(this).moveToFront();
   }
 
+  function generateUniqueValue(coordinate, index) {
+    while(1){
+      const newVal = (coordinate === 'x') ? d3.randomUniform(minBoundingX, maxBoundingX)() : d3.randomUniform(minBoundingY, maxBoundingY)();
+      let flag = true;
+      
+      for(let i = 0; i < index; i++){
+        const d = data["widgets"][i];
+        if(coordinate === 'x'){
+          if (newVal > d.fx - bigRectLength * 3 && newVal < d.fx + bigRectLength * 3){
+            flag = false;
+            break;
+          }
+        } else {
+          if (newVal > d.fy - bigRectLength * 2 && newVal > d.fy + bigRectLength * 2){
+            flag = false;
+            break;
+          }
+        }
+      }
+
+      if(flag) return newVal;
+    }
+  }
+
   const groups = svg.selectAll('g')
     .data(data["widgets"]).enter()
     .append('g')
-      .attr('id', (d) => {				
-        const dx = d3.randomUniform(minBoundingX, maxBoundingX)();
-        const dy = d3.randomUniform(minBoundingY, maxBoundingY)();
+      .attr('id', (d) => d.widget_id)
+      .attr("transform", (d, i) => {
+        const dx = generateUniqueValue('x', i);
+        const dy = generateUniqueValue('y', i);
         d.fx = dx; d.fy = dy;
-
-        return d.widget_id;
+        return `translate(${d.fx},${d.fy})`
       })
-      .attr("transform", (d) => `translate(${d.fx},${d.fy})`)
       .attr("render-order", 1)
       .call(d3.drag().on('start', dragStarted).on('drag', dragged));
   
@@ -156,8 +179,9 @@ const ResearchWidget = (data) => {
   function makeEdge(d) {
     var source = document.getElementById(`${d.source_widget}_${d.source_entity}`).getBoundingClientRect();
     var target = document.getElementById(`${d.destination_widget}_${d.destination_entity}`).getBoundingClientRect();
-    
-    var maxY = Math.max(source.y, target.y) + yDiff;
+
+    var df = d3.randomUniform(3000, 5000)() / 100;
+    var maxY = Math.max(source.y, target.y) + df + yDiff;
     return [
       {"x": source.x-xDiff, "y": source.y + smallRectLength/2},
       {"x": source.x-xDiff, "y": maxY},
