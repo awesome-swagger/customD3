@@ -199,19 +199,31 @@ const ResearchWidget = (data) => {
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; });
 
+  function checkMaxY(d){
+    for(let connection of data.connections) {
+      if (connection === d) continue;
+      if(Math.abs(d.maxY - connection.maxY) < 5) return true;
+    }
+    return false;
+  }
+
   function makeEdge(d) {
     var source = document.getElementById(`${d.source_widget}_${d.source_entity}`).getBoundingClientRect();
     var target = document.getElementById(`${d.destination_widget}_${d.destination_entity}`).getBoundingClientRect();
 
-    var maxY = Math.max(source.y, target.y) + yDiff;
+    d.maxY = Math.max(source.y, target.y) + yDiff;
+    while(checkMaxY(d)){
+      d.maxY += 20;
+    }
 
     return [
       {"x": source.x-xDiff, "y": source.y + smallRectLength/2},
-      {"x": source.x-xDiff, "y": maxY},
-      {"x": target.x-xDiff, "y": maxY},
+      {"x": source.x-xDiff, "y": d.maxY},
+      {"x": target.x-xDiff, "y": d.maxY},
       {"x": target.x-xDiff, "y": target.y + smallRectLength/2}
     ];
   }
+
   const edges = widgetContent.selectAll('.edge')
     .data(data.connections).enter()
     .append("path")
