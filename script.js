@@ -8,7 +8,7 @@ const ResearchWidget = (data) => {
 
   const bigRectLength = windowWidth>1024 ? 80 : windowWidth>768 ? 60 : 40;
   const bigRectBorderRadius = bigRectLength / 15;
-  const smallRectLength = bigRectLength / 5;
+  const smallRectLength = bigRectLength / 6;
   const smallRectBorderRadius = smallRectLength / 4;
   let scale = 1;
   const zoomBtnSize = 25;
@@ -219,10 +219,10 @@ const ResearchWidget = (data) => {
     }
 
     return [
-      {"x": source.x-xDiff, "y": source.y + smallRectLength/2},
+      {"x": source.x-xDiff, "y": source.y + smallRectLength/4},
       {"x": source.x-xDiff, "y": d.maxY},
       {"x": target.x-xDiff, "y": d.maxY},
-      {"x": target.x-xDiff, "y": target.y + smallRectLength/2}
+      {"x": target.x-xDiff, "y": target.y + smallRectLength/4}
     ];
   }
 
