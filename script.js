@@ -104,7 +104,7 @@ const ResearchWidget = (data) => {
 
     const tooltipRect = tooltip.node().getBoundingClientRect();
 
-    tooltip.style('top', d.fy - tooltipRect.height + 'px').style('left', (d.fx + xDiff - 2 - tooltipRect.width / 2 + bigRectLength * 1.5) + 'px');
+    tooltip.style('top', d.fy - tooltipRect.height - 5 + 'px').style('left', (d.fx + xDiff - 2 - tooltipRect.width / 2 + bigRectLength * 1.5) + 'px');
 
     d3.select(this).attr("transform", `translate(${d.fx},${d.fy})`)
     updateEdge(d.widget_id);
@@ -163,7 +163,7 @@ const ResearchWidget = (data) => {
               .transition().duration(300).style("opacity", "1");
       
       const tooltipRect = tooltip.node().getBoundingClientRect();
-      tooltip.style('top', d.fy - tooltipRect.height + 'px').style('left', (d.fx + xDiff - 2 - tooltipRect.width / 2 + bigRectLength * 1.5) + 'px');
+      tooltip.style('top', d.fy - tooltipRect.height - 5 + 'px').style('left', (d.fx + xDiff - 2 - tooltipRect.width / 2 + bigRectLength * 1.5) + 'px');
     });
 
   const nodeGroup = groups.selectAll('g')
