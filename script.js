@@ -40,12 +40,14 @@ const ResearchWidget = (data) => {
       scale -= 0.1;
       d3.select('#group').attr("transform", `translate(0, 0) scale(${scale})`);
     }
+    tooltip.style("opacity", "0")
   }
   function onZoomOut() {
     if(scale < 2){
       scale += 0.1;
       d3.select('#group').attr("transform", `translate(0, 0) scale(${scale})`);
     }
+    tooltip.style("opacity", "0")
   }
   d3.select('#zoom_out image').attr('width', zoomBtnSize).attr('height', zoomBtnSize); 
   d3.select('#zoom_in image').attr('width', zoomBtnSize).attr('height', zoomBtnSize); 
