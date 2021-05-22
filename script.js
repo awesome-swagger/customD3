@@ -10,6 +10,7 @@ const ResearchWidget = (data) => {
   const bigRectBorderRadius = bigRectLength / 15;
   const smallRectLength = bigRectLength / 5;
   const smallRectBorderRadius = smallRectLength / 4;
+  let scale = 1;
   const zoomBtnSize = 25;
   const fontSize = 12;
   const xOffset = document.getElementById('research-widget').getBoundingClientRect().x;
@@ -25,6 +26,7 @@ const ResearchWidget = (data) => {
   const colorArray = ["#C7E8AC", "#99D2F2","#F28F80"];
 
   const tooltip = d3.select(".tooltip");
+  const pathDiffs = {};
   
   d3.selection.prototype.moveToFront = function() {
     return this.each(function(){
@@ -34,10 +36,16 @@ const ResearchWidget = (data) => {
   
   /* Zoom in/out Button */
   function onZoomIn() {
-    console.log('in');
+    if(scale > 1){
+      scale -= 0.1;
+      d3.select('#group').attr("transform", `translate(0, 0) scale(${scale})`);
+    }
   }
   function onZoomOut() {
-    console.log('out');
+    if(scale < 2){
+      scale += 0.1;
+      d3.select('#group').attr("transform", `translate(0, 0) scale(${scale})`);
+    }
   }
   d3.select('#zoom_out image').attr('width', zoomBtnSize).attr('height', zoomBtnSize); 
   d3.select('#zoom_in image').attr('width', zoomBtnSize).attr('height', zoomBtnSize); 
@@ -127,7 +135,8 @@ const ResearchWidget = (data) => {
     }
   }
 
-  const groups = svg.selectAll('g')
+  const widgetContent = svg.append('g').attr('id', 'group');
+  const groups = widgetContent.selectAll('g')
     .data(data["widgets"]).enter()
     .append('g')
       .attr('id', (d) => d.widget_id)
@@ -194,8 +203,8 @@ const ResearchWidget = (data) => {
     var source = document.getElementById(`${d.source_widget}_${d.source_entity}`).getBoundingClientRect();
     var target = document.getElementById(`${d.destination_widget}_${d.destination_entity}`).getBoundingClientRect();
 
-    var df = d3.randomUniform(3000, 5000)() / 100;
-    var maxY = Math.max(source.y, target.y) + df + yDiff;
+    var maxY = Math.max(source.y, target.y) + yDiff;
+
     return [
       {"x": source.x-xDiff, "y": source.y + smallRectLength/2},
       {"x": source.x-xDiff, "y": maxY},
@@ -203,7 +212,7 @@ const ResearchWidget = (data) => {
       {"x": target.x-xDiff, "y": target.y + smallRectLength/2}
     ];
   }
-  const edges = svg.selectAll('.edge')
+  const edges = widgetContent.selectAll('.edge')
     .data(data.connections).enter()
     .append("path")
     .attr('class', 'edge')
